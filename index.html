@@ -170,80 +170,79 @@
                 const enemy = enemies.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 300), 'enemy');
                 enemy.setCollideWorldBounds(true);
                 enemy.setBounce(1);
-                enemy.setVelocityX(Phaser.Math.Between(-100
-                                                       , 100));
-                                                                       enemy.setVelocityY(Phaser.Math.Between(-100, 100));
-                                                                       enemy.setCircle(20);
-                                                                       enemyCount++;
-                                                                   }
-                                                               }
+                enemy.setVelocityX(Phaser.Math.Between(-100 , 100));
+               enemy.setVelocityY(Phaser.Math.Between(-100, 100));
+               enemy.setCircle(20);
+               enemyCount++;
+           }
+       }
 
-                                                               function spawnPortal() {
-                                                                   const portal = portals.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 550), 'portal'); // Randomize portal position
-                                                                   portal.setCollideWorldBounds(true);
-                                                               }
+       function spawnPortal() {
+           const portal = portals.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 550), 'portal'); // Randomize portal position
+           portal.setCollideWorldBounds(true);
+       }
 
-                                                               function playerHitEnemy(player, enemy) {
-                                                                   // If shield is active, don't lose the game when hit by enemy
-                                                                   if (!shieldActive) {
-                                                                       gameOverText.setVisible(true);
-                                                                       sceneRef.time.delayedCall(1000, restartGame, [], sceneRef); // Restart the game after 1 second
-                                                                       timeElapsed = 0; // Reset the time elapsed when player dies
-                                                                       shieldCooldown = false; // Reset the shield cooldown when player dies
-                                                                   }
-                                                               }
+       function playerHitEnemy(player, enemy) {
+           // If shield is active, don't lose the game when hit by enemy
+           if (!shieldActive) {
+               gameOverText.setVisible(true);
+               sceneRef.time.delayedCall(1000, restartGame, [], sceneRef); // Restart the game after 1 second
+               timeElapsed = 0; // Reset the time elapsed when player dies
+               shieldCooldown = false; // Reset the shield cooldown when player dies
+           }
+       }
 
-                                                               function bulletHitEnemy(bullet, enemy) {
-                                                                   bullet.destroy();
-                                                                   enemy.destroy();
-                                                                   enemyCount--;
-                                                                   kills++; // Increment kills when an enemy is destroyed
-                                                                   killsText.setText('Kills: ' + kills); // Update kills text
-                                                               }
+       function bulletHitEnemy(bullet, enemy) {
+           bullet.destroy();
+           enemy.destroy();
+           enemyCount--;
+           kills++; // Increment kills when an enemy is destroyed
+           killsText.setText('Kills: ' + kills); // Update kills text
+       }
 
-                                                               function nextLevel() {
-                                                                   level++;
-                                                                   enemyCount = 0;
-                                                                   enemies.clear(true, true);
-                                                                   bullets.clear(true, true);
-                                                                   portals.clear(true, true);
-                                                                   spawnEnemies.call(this);
-                                                                   spawnPortal.call(this);
-                                                                   timeElapsed = 0; // Reset the time elapsed when player reaches the next level
-                                                                   levelText.setText('Level: ' + level); // Update level text
-                                                               }
+       function nextLevel() {
+           level++;
+           enemyCount = 0;
+           enemies.clear(true, true);
+           bullets.clear(true, true);
+           portals.clear(true, true);
+           spawnEnemies.call(this);
+           spawnPortal.call(this);
+           timeElapsed = 0; // Reset the time elapsed when player reaches the next level
+           levelText.setText('Level: ' + level); // Update level text
+       }
 
-                                                               function updateTimer() {
-                                                                   timeElapsed++;
-                                                                   timerText.setText('Time: ' + timeElapsed + 's');
-                                                               }
+       function updateTimer() {
+           timeElapsed++;
+           timerText.setText('Time: ' + timeElapsed + 's');
+       }
 
-                                                               function activateShield() {
-                                                                   shieldActive = true;
-                                                                   player.setTexture('player_shield'); // Change player sprite to shielded version
+       function activateShield() {
+           shieldActive = true;
+           player.setTexture('player_shield'); // Change player sprite to shielded version
 
-                                                                   // Set a timer to deactivate the shield after its duration
-                                                                   shieldDuration = 3000; // Reset shield duration
-                                                                   sceneRef.time.delayedCall(shieldDuration, deactivateShield, [], sceneRef);
+           // Set a timer to deactivate the shield after its duration
+           shieldDuration = 3000; // Reset shield duration
+           sceneRef.time.delayedCall(shieldDuration, deactivateShield, [], sceneRef);
 
-                                                                   // Set the cooldown for shield usage
-                                                                   shieldCooldown = true;
-                                                               }
+           // Set the cooldown for shield usage
+           shieldCooldown = true;
+       }
 
-                                                               function deactivateShield() {
-                                                                   shieldActive = false;
-                                                                   player.setTexture('player'); // Change player sprite back to normal
-                                                               }
+       function deactivateShield() {
+           shieldActive = false;
+           player.setTexture('player'); // Change player sprite back to normal
+       }
 
-                                                               function restartGame() {
-                                                                   gameOverText.setVisible(false);
-                                                                   shieldCooldown = false; // Reset shield cooldown when game restarts
-                                                                   level = 1; // Reset level
-                                                                   levelText.setText('Level: ' + level); // Update level text
-                                                                   kills = 0; // Reset kills
-                                                                   killsText.setText('Kills: ' + kills); // Update kills text
-                                                                   sceneRef.scene.restart();
-                                                               }
-                                                           </script>
-                                                       </body>
-                                                       </html>
+       function restartGame() {
+           gameOverText.setVisible(false);
+           shieldCooldown = false; // Reset shield cooldown when game restarts
+           level = 1; // Reset level
+           levelText.setText('Level: ' + level); // Update level text
+           kills = 0; // Reset kills
+           killsText.setText('Kills: ' + kills); // Update kills text
+           sceneRef.scene.restart();
+       }
+   </script>
+</body>
+</html>
