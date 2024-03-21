@@ -9,6 +9,19 @@
     <style>
         body { margin: 0; }
         canvas { display: block; }
+        #start-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        #start-button {
+            padding: 10px 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -55,6 +68,8 @@
         let shieldCooldownDuration = 3000; // Cooldown duration for shield in milliseconds
         let levelText; // Text to display current level
         let killsText; // Text to display kills
+        let startButton;
+        let startMenu;
 
         function preload() {
             this.load.image('background', 'https://raw.githubusercontent.com/big-buckets/extermination./main/assets/background.png'); // Load the background image
@@ -68,6 +83,26 @@
         function create() {
             sceneRef = this;
             this.add.image(400, 300, 'background').setScrollFactor(0); // Add the background image
+
+            // Create start menu
+            startMenu = this.add.container(0, 0);
+            startMenu.setDepth(1); // Ensure start menu is above other elements
+
+            const startMenuBackground = this.add.graphics();
+            startMenuBackground.fillStyle(0x000000, 0.7);
+            startMenuBackground.fillRect(0, 0, 800, 600);
+            startMenu.add(startMenuBackground);
+
+            const startMenuText = this.add.text(400, 250, 'extermination.', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+            startMenu.add(startMenuText);
+
+            startButton = this.add.text(400, 350, 'Start Game', { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+            startButton.setInteractive();
+            startButton.on('pointerdown', startGame);
+            startMenu.add(startButton);
+
+            // Hide start menu by default
+            startMenu.setVisible(false);
 
             keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
             keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -100,149 +135,165 @@
             timerText = this.add.text(680, 20, 'Time: 0s', { fontSize: '20px', fill: '#fff' });
             timer = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this, loop: true });
 
-            gameOverText = this.add.text(400, 300, 'Game Over', { fontSize: '48px', fill: '#ff0000', align: 'center' });
-            gameOverText.setOrigin(0.5);
-            gameOverText.setVisible(false);
+            gameOverText = this.add.text(400, 300, 'Game Over', { fontSize: '48px', fill:
+              '#ff0000', align: 'center' });
+          gameOverText.setOrigin(0.5);
+          gameOverText.setVisible(false);
 
-            // Add level text
-            levelText = this.add.text(20, 20, 'Level: ' + level, { fontSize: '20px', fill: '#fff' });
+          // Add level text
+          levelText = this.add.text(20, 20, 'Level: ' + level, { fontSize: '20px', fill: '#fff' });
 
-            // Add kills text
-            killsText = this.add.text(680, 50, 'Kills: 0', { fontSize: '20px', fill: '#fff' });
-        }
+          // Add kills text
+          killsText = this.add.text(680, 50, 'Kills: 0', { fontSize: '20px', fill: '#fff' });
 
-        function update() {
-            if (keyA.isDown || keyD.isDown) {
-                if (keyA.isDown) {
-                    player.setVelocityX(-400);
-                    player.setFlipX(true); // Flip the sprite horizontally when moving left
-                } else if (keyD.isDown) {
-                    player.setVelocityX(400);
-                    player.setFlipX(false); // Don't flip the sprite when moving right
-                }
-            } else {
-                player.setVelocityX(0);
-            }
+          // Hide other UI elements when the game starts
+          levelText.setVisible(false);
+          killsText.setVisible(false);
+          timerText.setVisible(false);
 
-            // Check if the player is touching the ground and the 'W' key is pressed
-            if (keyW.isDown) {
-                player.setY(player.y - 20); // Increment the y-axis position by 20
-            }
+          // Show the start menu
+          startMenu.setVisible(true);
+      }
 
-            // Check for bullets out of screen and destroy them
-            bullets.children.each(function(bullet) {
-                if (bullet.y < 0 || bullet.y > game.config.height) {
-                    bullet.destroy();
-                }
-            });
+      function update() {
+          if (keyA.isDown || keyD.isDown) {
+              if (keyA.isDown) {
+                  player.setVelocityX(-400);
+                  player.setFlipX(true); // Flip the sprite horizontally when moving left
+              } else if (keyD.isDown) {
+                  player.setVelocityX(400);
+                  player.setFlipX(false); // Don't flip the sprite when moving right
+              }
+          } else {
+              player.setVelocityX(0);
+          }
 
-            // Update shield cooldown
-            if (shieldCooldown) {
-                shieldCooldownDuration -= this.sys.game.loop.delta;
-                if (shieldCooldownDuration <= 0) {
-                    shieldCooldown = false;
-                    shieldCooldownDuration = 3000; // Reset cooldown duration
-                }
-            }
+          // Check if the player is touching the ground and the 'W' key is pressed
+          if (keyW.isDown) {
+              player.setY(player.y - 20); // Increment the y-axis position by 20
+          }
 
-            // Check if 'O' key is pressed, shield is not active, and shield is not on cooldown
-            if (keyO.isDown && !shieldActive && !shieldCooldown) {
-                activateShield();
-            }
+          // Check for bullets out of screen and destroy them
+          bullets.children.each(function(bullet) {
+              if (bullet.y < 0 || bullet.y > game.config.height) {
+                  bullet.destroy();
+              }
+          });
 
-            // Update shield duration and deactivate shield if time is up
-            if (shieldActive) {
-                shieldDuration -= this.sys.game.loop.delta;
-                if (shieldDuration <= 0) {
-                    deactivateShield();
-                }
-            }
-        }
+          // Update shield cooldown
+          if (shieldCooldown) {
+              shieldCooldownDuration -= this.sys.game.loop.delta;
+              if (shieldCooldownDuration <= 0) {
+                  shieldCooldown = false;
+                  shieldCooldownDuration = 3000; // Reset cooldown duration
+              }
+          }
 
-        function shootBullet() {
-            const bullet = bullets.create(player.x, player.y, 'bullet');
-            bullet.setVelocityX(player.flipX ? -400 : 400); // Shoot left if player flipped, otherwise shoot right
-        }
+          // Check if 'O' key is pressed, shield is not active, and shield is not on cooldown
+          if (keyO.isDown && !shieldActive && !shieldCooldown) {
+              activateShield();
+          }
 
-        function spawnEnemies() {
-            const numEnemies = Phaser.Math.Between(1, 2) * level; // Random number of enemies based on the level
-            for (let i = 0; i < numEnemies; i++) {
-                const enemy = enemies.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 300), 'enemy');
-                enemy.setCollideWorldBounds(true);
-                enemy.setBounce(1);
-                enemy.setVelocityX(Phaser.Math.Between(-100 , 100));
-               enemy.setVelocityY(Phaser.Math.Between(-100, 100));
-               enemy.setCircle(20);
-               enemyCount++;
-           }
-       }
+          // Update shield duration and deactivate shield if time is up
+          if (shieldActive) {
+              shieldDuration -= this.sys.game.loop.delta;
+              if (shieldDuration <= 0) {
+                  deactivateShield();
+              }
+          }
+      }
 
-       function spawnPortal() {
-           const portal = portals.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 550), 'portal'); // Randomize portal position
-           portal.setCollideWorldBounds(true);
-       }
+      function shootBullet() {
+          const bullet = bullets.create(player.x, player.y, 'bullet');
+          bullet.setVelocityX(player.flipX ? -400 : 400); // Shoot left if player flipped, otherwise shoot right
+      }
 
-       function playerHitEnemy(player, enemy) {
-           // If shield is active, don't lose the game when hit by enemy
-           if (!shieldActive) {
-               gameOverText.setVisible(true);
-               sceneRef.time.delayedCall(1000, restartGame, [], sceneRef); // Restart the game after 1 second
-               timeElapsed = 0; // Reset the time elapsed when player dies
-               shieldCooldown = false; // Reset the shield cooldown when player dies
-           }
-       }
+      function spawnEnemies() {
+          const numEnemies = Phaser.Math.Between(1, 2) * level; // Random number of enemies based on the level
+          for (let i = 0; i < numEnemies; i++) {
+              const enemy = enemies.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 300), 'enemy');
+              enemy.setCollideWorldBounds(true);
+              enemy.setBounce(1);
+              enemy.setVelocityX(Phaser.Math.Between(-100 , 100));
+              enemy.setVelocityY(Phaser.Math.Between(-100, 100));
+              enemy.setCircle(20);
+              enemyCount++;
+          }
+      }
 
-       function bulletHitEnemy(bullet, enemy) {
-           bullet.destroy();
-           enemy.destroy();
-           enemyCount--;
-           kills++; // Increment kills when an enemy is destroyed
-           killsText.setText('Kills: ' + kills); // Update kills text
-       }
+      function spawnPortal() {
+          const portal = portals.create(Phaser.Math.Between(50, 750), Phaser.Math.Between(50, 550), 'portal'); // Randomize portal position
+          portal.setCollideWorldBounds(true);
+      }
 
-       function nextLevel() {
-           level++;
-           enemyCount = 0;
-           enemies.clear(true, true);
-           bullets.clear(true, true);
-           portals.clear(true, true);
-           spawnEnemies.call(this);
-           spawnPortal.call(this);
-           timeElapsed = 0; // Reset the time elapsed when player reaches the next level
-           levelText.setText('Level: ' + level); // Update level text
-       }
+      function playerHitEnemy(player, enemy) {
+          // If shield is active, don't lose the game when hit by enemy
+          if (!shieldActive) {
+              gameOverText.setVisible(true);
+              sceneRef.time.delayedCall(1000, restartGame, [], sceneRef); // Restart the game after 1 second
+              timeElapsed = 0; // Reset the time elapsed when player dies
+              shieldCooldown = false; // Reset the shield cooldown when player dies
+          }
+      }
 
-       function updateTimer() {
-           timeElapsed++;
-           timerText.setText('Time: ' + timeElapsed + 's');
-       }
+      function bulletHitEnemy(bullet, enemy) {
+          bullet.destroy();
+          enemy.destroy();
+          enemyCount--;
+          kills++; // Increment kills when an enemy is destroyed
+          killsText.setText('Kills: ' + kills); // Update kills text
+      }
 
-       function activateShield() {
-           shieldActive = true;
-           player.setTexture('player_shield'); // Change player sprite to shielded version
+      function nextLevel() {
+          level++;
+          enemyCount = 0;
+          enemies.clear(true, true);
+          bullets.clear(true, true);
+          portals.clear(true, true);
+          spawnEnemies.call(this);
+          spawnPortal.call(this);
+          timeElapsed = 0; // Reset the time elapsed when player reaches the next level
+          levelText.setText('Level: ' + level); // Update level text
+      }
 
-           // Set a timer to deactivate the shield after its duration
-           shieldDuration = 3000; // Reset shield duration
-           sceneRef.time.delayedCall(shieldDuration, deactivateShield, [], sceneRef);
+      function updateTimer() {
+          timeElapsed++;
+          timerText.setText('Time: ' + timeElapsed + 's');
+      }
 
-           // Set the cooldown for shield usage
-           shieldCooldown = true;
-       }
+      function activateShield() {
+          shieldActive = true;
+          player.setTexture('player_shield'); // Change player sprite to shielded version
 
-       function deactivateShield() {
-           shieldActive = false;
-           player.setTexture('player'); // Change player sprite back to normal
-       }
+          // Set a timer to deactivate the shield after its duration
+          shieldDuration = 3000; // Reset shield duration
+          sceneRef.time.delayedCall(shieldDuration, deactivateShield, [], sceneRef);
 
-       function restartGame() {
-           gameOverText.setVisible(false);
-           shieldCooldown = false; // Reset shield cooldown when game restarts
-           level = 1; // Reset level
-           levelText.setText('Level: ' + level); // Update level text
-           kills = 0; // Reset kills
-           killsText.setText('Kills: ' + kills); // Update kills text
-           sceneRef.scene.restart();
-       }
-   </script>
+          // Set the cooldown for shield usage
+          shieldCooldown = true;
+      }
+
+      function deactivateShield() {
+          shieldActive = false;
+          player.setTexture('player'); // Change player sprite back to normal
+      }
+
+      function restartGame() {
+          gameOverText.setVisible(false);
+          shieldCooldown = false; // Reset shield cooldown when game restarts
+          level = 1; // Reset level
+          levelText.setText('Level: ' + level); // Update level text
+          kills = 0; // Reset kills
+          killsText.setText('Kills: ' + kills); // Update kills text
+          sceneRef.scene.restart();
+      }
+
+      function startGame() {
+          startMenu.setVisible(false);
+          levelText.setVisible(true);
+          killsText.setVisible(true);
+          timerText.setVisible(true);
+      }
+  </script>
 </body>
 </html>
