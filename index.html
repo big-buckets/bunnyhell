@@ -92,7 +92,7 @@
             startMenuBackground.fillStyle(0x000000, 0.7);
             startMenuBackground.fillRect(0, 0, 800, 600);
             startMenu.add(startMenuBackground);
-            const controlsText = this.add.text(400, 450, 'A - Left\nD - Right\nW - Rocket Boots\nZ - Shoot\nO - Shield', { fontSize: '20px', fill: '#fff', align: 'center' }).setOrigin(0.5);
+            const controlsText = this.add.text(400, 450, 'A - Left\nD - Right\nW - Rocket Boots\nI - Shoot\nO - Shield', { fontSize: '20px', fill: '#fff', align: 'center' }).setOrigin(0.5);
             startMenu.add(controlsText);
 
             const startMenuText = this.add.text(400, 250, 'extermination.', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
@@ -133,7 +133,7 @@
             this.physics.add.collider(bullets, enemies, bulletHitEnemy);
             this.physics.add.collider(player, portals, nextLevel, null, this);
 
-            this.input.keyboard.on('keydown-Z', shootBullet, this);
+            this.input.keyboard.on('keydown-I', shootBullet, this);
 
             timerText = this.add.text(680, 20, 'Time: 0s', { fontSize: '20px', fill: '#fff' });
             timer = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this, loop: true });
