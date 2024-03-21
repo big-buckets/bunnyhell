@@ -92,6 +92,8 @@
             startMenuBackground.fillStyle(0x000000, 0.7);
             startMenuBackground.fillRect(0, 0, 800, 600);
             startMenu.add(startMenuBackground);
+            const controlsText = this.add.text(400, 450, 'A - Left\nD - Right\nW - Rocket Boots\nZ - Shoot\nO - Shield', { fontSize: '20px', fill: '#fff', align: 'center' }).setOrigin(0.5);
+            startMenu.add(controlsText);
 
             const startMenuText = this.add.text(400, 250, 'extermination.', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
             startMenu.add(startMenuText);
@@ -100,8 +102,6 @@
             startButton.setInteractive();
             startButton.on('pointerdown', startGame);
             startMenu.add(startButton);
-            const controlsText = this.add.text(400, 450, 'A - Left\nD - Right\nW - Rocket Boots\nZ - Shoot\nO - Shield', { fontSize: '20px', fill: '#fff', align: 'center' }).setOrigin(0.5);
-            startMenu.add(controlsText);
 
 
             // Hide start menu by default
