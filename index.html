@@ -100,6 +100,9 @@
             startButton.setInteractive();
             startButton.on('pointerdown', startGame);
             startMenu.add(startButton);
+            const controlsText = this.add.text(400, 450, 'A - Left\nD - Right\nW - Rocket Boots\nZ - Shoot\nO - Shield', { fontSize: '20px', fill: '#fff', align: 'center' }).setOrigin(0.5);
+            startMenu.add(controlsText);
+
 
             // Hide start menu by default
             startMenu.setVisible(false);
